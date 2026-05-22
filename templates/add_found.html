@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Add Found Item</title>
+
+    <!-- Bootstrap -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+
+    <!-- Bootstrap Icons -->
+    <link rel="stylesheet"
+          href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+
+    <style>
+
+        body{
+            background: #f4f6f9;
+        }
+
+        .card{
+            border: none;
+            border-radius: 20px;
+        }
+
+        .form-control{
+            border-radius: 10px;
+        }
+
+        .btn{
+            border-radius: 10px;
+        }
+
+        .title{
+            color: #198754;
+            font-weight: bold;
+        }
+
+    </style>
+
+</head>
+
+<body>
+
+<div class="container mt-5">
+
+    <div class="row justify-content-center">
+
+        <div class="col-md-7">
+
+            <div class="card shadow-lg p-4">
+
+                <!-- TITLE -->
+                <div class="text-center mb-4">
+
+                    <h2 class="title">
+                        <i class="bi bi-check-circle-fill"></i>
+                        Report Found Item
+                    </h2>
+
+                    <p class="text-muted">
+                        Submit found item information clearly
+                    </p>
+
+                </div>
+
+                <!-- SUCCESS MESSAGES -->
+                {% if messages %}
+
+                    {% for message in messages %}
+
+                    <div class="alert alert-success alert-dismissible fade show">
+
+                        {{ message }}
+
+                        <button type="button"
+                                class="btn-close"
+                                data-bs-dismiss="alert">
+                        </button>
+
+                    </div>
+
+                    {% endfor %}
+
+                {% endif %}
+
+                <!-- FORM -->
+                <form method="POST" enctype="multipart/form-data">
+
+                    {% csrf_token %}
+
+                    <!-- NAME -->
+             <input type="text" name="location_found" class="form-control" placeholder="Where was it found?" required>
+
+                        <label class="form-label fw-bold">
+                            Item Name
+                        </label>
+
+                        <input type="text"
+                               name="name"
+                               class="form-control"
+                               placeholder="Enter item name"
+                               required>
+
+                    </div>
+
+                    <!-- DESCRIPTION -->
+                    <div class="mb-3">
+
+                        <label class="form-label fw-bold">
+                            Description
+                        </label>
+
+                        <textarea name="description"
+                                  class="form-control"
+                                  rows="4"
+                                  placeholder="Describe the item"
+                                  required></textarea>
+
+                    </div>
+
+                    <!-- SAFE LOCATION FIELD -->
+                    <div class="mb-3">
+
+                        <label class="form-label fw-bold">
+                            Location Found
+                        </label>
+
+                        <input type="text"
+                               name="location"
+                               class="form-control"
+                               placeholder="Where was it found?"
+                               required>
+
+                    </div>
+
+                    <!-- DATE -->
+                    <div class="mb-3">
+
+                        <label class="form-label fw-bold">
+                            Date Found
+                        </label>
+
+                        <input type="date"
+                               name="date_found"
+                               class="form-control"
+                               required>
+
+                    </div>
+
+                    <!-- IMAGE -->
+                    <div class="mb-4">
+
+                        <label class="form-label fw-bold">
+                            Upload Image
+                        </label>
+
+                        <input type="file"
+                               name="image"
+                               class="form-control">
+
+                    </div>
+
+                    <!-- BUTTON -->
+                    <button class="btn btn-success w-100 py-2">
+
+                        <i class="bi bi-upload"></i>
+                        Submit Found Item
+
+                    </button>
+
+                </form>
+
+                <!-- BACK BUTTON -->
+                <a href="{% url 'dashboard' %}"
+                   class="btn btn-secondary w-100 mt-3">
+
+                    <i class="bi bi-arrow-left"></i>
+                    Back to Dashboard
+
+                </a>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+
+</body>
+</html>

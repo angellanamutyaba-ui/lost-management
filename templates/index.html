@@ -1,0 +1,16 @@
+{% extends 'base.html' %}
+
+{% block content %}
+
+<div class="text-center mt-5">
+    <h1 class="mb-3">Welcome to Lost & Found Management System</h1>
+    <p class="lead">Helping students recover lost items quickly and easily.</p>
+
+    <div class="mt-4">
+        <a href="/dashboard/" class="btn btn-primary btn-lg me-2">View Items</a>
+        <a href="/add-lost/" class="btn btn-danger btn-lg me-2">Report Lost Item</a>
+        <a href="/add-found/" class="btn btn-success btn-lg">Report Found Item</a>
+    </div>
+</div>
+
+{% endblock %}

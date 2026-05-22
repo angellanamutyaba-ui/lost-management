@@ -1,0 +1,513 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Lost Management System</title>
+
+    <!-- Bootstrap -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+    
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+    <style>
+        body {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+        }
+        
+        .hero-section {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 80px 0;
+            margin-top: -20px;
+        }
+        
+        .feature-card {
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            border: none;
+            border-radius: 15px;
+            overflow: hidden;
+        }
+        
+        .feature-card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+        }
+        
+        .stats-card {
+            border: none;
+            border-radius: 15px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .stats-card:hover {
+            transform: scale(1.05);
+        }
+        
+        .item-card {
+            transition: transform 0.3s ease;
+            border: none;
+            border-radius: 12px;
+            overflow: hidden;
+        }
+        
+        .item-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 5px 20px rgba(0,0,0,0.15);
+        }
+        
+        .item-image {
+            height: 200px;
+            object-fit: cover;
+        }
+        
+        .navbar {
+            background: rgba(255,255,255,0.95) !important;
+            backdrop-filter: blur(10px);
+            box-shadow: 0 2px 20px rgba(0,0,0,0.1);
+        }
+        
+        .btn-gradient {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border: none;
+            color: white;
+            transition: transform 0.3s ease;
+        }
+        
+        .btn-gradient:hover {
+            transform: translateY(-2px);
+            color: white;
+        }
+        
+        .section-title {
+            position: relative;
+            margin-bottom: 40px;
+            font-weight: bold;
+        }
+        
+        .section-title:after {
+            content: '';
+            position: absolute;
+            bottom: -10px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 60px;
+            height: 3px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        }
+        
+        .footer {
+            background: #2d3748;
+            color: white;
+            padding: 40px 0 20px;
+            margin-top: 60px;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        .fade-in {
+            animation: fadeIn 0.6s ease-out;
+        }
+    </style>
+</head>
+
+<body>
+
+<!-- NAVBAR -->
+<nav class="navbar navbar-expand-lg sticky-top">
+    <div class="container">
+        <a class="navbar-brand fw-bold text-primary" href="/">
+            <i class="bi bi-search-heart me-2"></i>
+            Lost & Found System
+        </a>
+        
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        
+        <div class="collapse navbar-collapse" id="navbarNav">
+            <ul class="navbar-nav ms-auto align-items-center">
+                <li class="nav-item">
+                    <a class="nav-link fw-bold" href="/dashboard/">
+                        <i class="bi bi-speedometer2"></i> Dashboard
+                    </a>
+                </li>
+                
+                {% if user.is_authenticated %}
+                <li class="nav-item dropdown">
+                    <a class="nav-link dropdown-toggle fw-bold" href="#" role="button" data-bs-toggle="dropdown">
+                        <i class="bi bi-plus-circle"></i> Report Item
+                    </a>
+                    <ul class="dropdown-menu">
+                        <li><a class="dropdown-item" href="/add-lost/">
+                            <i class="bi bi-exclamation-triangle text-danger"></i> Report Lost
+                        </a></li>
+                        <li><a class="dropdown-item" href="/add-found/">
+                            <i class="bi bi-check-circle text-success"></i> Report Found
+                        </a></li>
+                    </ul>
+                </li>
+                <li class="nav-item ms-2">
+                    <a class="btn btn-outline-danger" href="/logout/">
+                        <i class="bi bi-box-arrow-right"></i> Logout
+                    </a>
+                </li>
+                {% else %}
+                <li class="nav-item">
+                    <a class="btn btn-outline-primary me-2" href="/login/">
+                        <i class="bi bi-box-arrow-in-right"></i> Login
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="btn btn-gradient" href="/register/">
+                        <i class="bi bi-person-plus"></i> Register
+                    </a>
+                </li>
+                {% endif %}
+            </ul>
+        </div>
+    </div>
+</nav>
+
+<!-- HERO SECTION -->
+<div class="hero-section fade-in">
+    <div class="container text-center">
+        <h1 class="display-4 fw-bold mb-4">
+            <i class="bi bi-search-heart"></i> Lost & Found Management System
+        </h1>
+        <p class="lead mb-4">Help reunite lost items with their owners quickly and efficiently</p>
+        
+        {% if not user.is_authenticated %}
+        <div class="mt-4">
+            <a href="/register/" class="btn btn-light btn-lg me-3">
+                <i class="bi bi-person-plus"></i> Get Started Free
+            </a>
+            <a href="/login/" class="btn btn-outline-light btn-lg">
+                <i class="bi bi-box-arrow-in-right"></i> Login
+            </a>
+        </div>
+        {% else %}
+        <div class="mt-4">
+            <a href="/dashboard/" class="btn btn-light btn-lg">
+                <i class="bi bi-speedometer2"></i> Go to Dashboard
+            </a>
+        </div>
+        {% endif %}
+    </div>
+</div>
+
+<!-- STATISTICS SECTION -->
+<div class="container mt-5">
+    <div class="row g-4">
+        <div class="col-md-3">
+            <div class="card stats-card bg-danger text-white shadow-lg text-center p-4">
+                <i class="bi bi-emoji-frown display-1"></i>
+                <h3 class="mt-3">{{ lost_count }}</h3>
+                <h6>Lost Items Reported</h6>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card stats-card bg-success text-white shadow-lg text-center p-4">
+                <i class="bi bi-emoji-smile display-1"></i>
+                <h3 class="mt-3">{{ found_count }}</h3>
+                <h6>Found Items Reported</h6>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card stats-card bg-primary text-white shadow-lg text-center p-4">
+                <i class="bi bi-gift display-1"></i>
+                <h3 class="mt-3">{{ claimed_count }}</h3>
+                <h6>Successfully Claimed</h6>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card stats-card bg-warning text-dark shadow-lg text-center p-4">
+                <i class="bi bi-clock-history display-1"></i>
+                <h3 class="mt-3">{{ unclaimed_count }}</h3>
+                <h6>Awaiting Claim</h6>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- HOW IT WORKS -->
+<div class="container mt-5">
+    <h2 class="text-center section-title">How It Works</h2>
+    <div class="row mt-4 g-4">
+        <div class="col-md-4">
+            <div class="card feature-card shadow text-center p-4">
+                <div class="text-center">
+                    <i class="bi bi-pencil-square display-1 text-primary"></i>
+                </div>
+                <h4 class="mt-3">1. Report Item</h4>
+                <p class="text-muted">Report lost or found items with details, location, and photos</p>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card feature-card shadow text-center p-4">
+                <div class="text-center">
+                    <i class="bi bi-clock-history display-1 text-warning"></i>
+                </div>
+                <h4 class="mt-3">2. Wait for Approval</h4>
+                <p class="text-muted">Our team reviews and approves items to ensure quality</p>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card feature-card shadow text-center p-4">
+                <div class="text-center">
+                    <i class="bi bi-hand-thumbs-up display-1 text-success"></i>
+                </div>
+                <h4 class="mt-3">3. Claim & Reunite</h4>
+                <p class="text-muted">Owners can claim their items and get reunited</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- SEARCH SECTION -->
+<div class="container mt-5">
+    <div class="card shadow-lg p-4 bg-white">
+        <h3 class="text-center mb-4">
+            <i class="bi bi-search"></i> Search for Items
+        </h3>
+        <form method="GET">
+            <div class="input-group">
+                <input type="text" name="q" class="form-control form-control-lg" 
+                       placeholder="Search by item name, description, or location..." value="{{ query }}">
+                <button class="btn btn-gradient btn-lg" type="submit">
+                    <i class="bi bi-search"></i> Search
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- RECENT LOST ITEMS -->
+<div class="container mt-5">
+    <h2 class="text-center section-title">Recently Lost Items</h2>
+    <div class="row">
+        {% for item in lost_items %}
+        <div class="col-md-4 mb-4">
+            <div class="card item-card shadow h-100">
+                {% if item.image %}
+                <img src="{{ item.image.url }}" class="item-image">
+                {% else %}
+                <div class="item-image bg-secondary d-flex align-items-center justify-content-center">
+                    <i class="bi bi-image display-1 text-white"></i>
+                </div>
+                {% endif %}
+                <div class="card-body">
+                    <h5 class="fw-bold text-danger">
+                        <i class="bi bi-exclamation-triangle"></i> {{ item.name }}
+                    </h5>
+                    <p class="text-muted">{{ item.description|truncatewords:20 }}</p>
+                    <div class="mt-3">
+                        <small class="text-muted">
+                            <i class="bi bi-geo-alt"></i> {{ item.location }}
+                        </small>
+                        <br>
+                        <small class="text-muted">
+                            <i class="bi bi-calendar"></i> Lost: {{ item.date_lost }}
+                        </small>
+                    </div>
+                </div>
+                <div class="card-footer bg-white border-0 pb-3">
+                    {% if item.is_claimed %}
+                    <span class="badge bg-success">
+                        <i class="bi bi-check-circle"></i> Claimed
+                    </span>
+                    {% else %}
+                    <span class="badge bg-warning text-dark">
+                        <i class="bi bi-clock"></i> Not Claimed
+                    </span>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+        {% empty %}
+        <div class="col-12">
+            <div class="alert alert-info text-center">
+                <i class="bi bi-info-circle"></i> No lost items reported yet.
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+</div>
+
+<!-- RECENT FOUND ITEMS -->
+<div class="container mt-5">
+    <h2 class="text-center section-title">Recently Found Items</h2>
+    <div class="row">
+        {% for item in found_items %}
+        <div class="col-md-4 mb-4">
+            <div class="card item-card shadow h-100">
+                {% if item.image %}
+                <img src="{{ item.image.url }}" class="item-image">
+                {% else %}
+                <div class="item-image bg-secondary d-flex align-items-center justify-content-center">
+                    <i class="bi bi-image display-1 text-white"></i>
+                </div>
+                {% endif %}
+                <div class="card-body">
+                    <h5 class="fw-bold text-success">
+                        <i class="bi bi-check-circle"></i> {{ item.name }}
+                    </h5>
+                    <p class="text-muted">{{ item.description|truncatewords:20 }}</p>
+                    <div class="mt-3">
+                        <small class="text-muted">
+                            <i class="bi bi-geo-alt"></i> Found: {{ item.location_found }}
+                        </small>
+                        <br>
+                        <small class="text-muted">
+                            <i class="bi bi-calendar"></i> Date: {{ item.date_found }}
+                        </small>
+                    </div>
+                </div>
+                <div class="card-footer bg-white border-0 pb-3">
+                    {% if item.is_claimed %}
+                    <span class="badge bg-success">
+                        <i class="bi bi-check-circle"></i> Claimed
+                    </span>
+                    {% else %}
+                    <span class="badge bg-warning text-dark">
+                        <i class="bi bi-clock"></i> Not Claimed
+                    </span>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+        {% empty %}
+        <div class="col-12">
+            <div class="alert alert-info text-center">
+                <i class="bi bi-info-circle"></i> No found items reported yet.
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+</div>
+
+<!-- STATISTICS CHART -->
+<div class="container mt-5">
+    <div class="card shadow-lg p-4">
+        <h3 class="text-center mb-4">
+            <i class="bi bi-graph-up"></i> System Statistics
+        </h3>
+        <canvas id="statsChart" height="100"></canvas>
+    </div>
+</div>
+
+<!-- CALL TO ACTION -->
+<div class="container mt-5">
+    <div class="card bg-primary text-white shadow-lg p-5 text-center">
+        <h2 class="mb-3">Lost or Found Something?</h2>
+        <p class="lead mb-4">Join our community and help reunite items with their owners</p>
+        {% if not user.is_authenticated %}
+        <div>
+            <a href="/register/" class="btn btn-light btn-lg">
+                <i class="bi bi-person-plus"></i> Create Free Account
+            </a>
+        </div>
+        {% else %}
+        <div>
+            <a href="/add-lost/" class="btn btn-danger btn-lg me-3">
+                <i class="bi bi-exclamation-triangle"></i> Report Lost
+            </a>
+            <a href="/add-found/" class="btn btn-success btn-lg">
+                <i class="bi bi-check-circle"></i> Report Found
+            </a>
+        </div>
+        {% endif %}
+    </div>
+</div>
+
+<!-- FOOTER -->
+<footer class="footer">
+    <div class="container">
+        <div class="row">
+            <div class="col-md-4">
+                <h5><i class="bi bi-search-heart"></i> Lost & Found System</h5>
+                <p>Helping people reunite with their lost belongings since 2024</p>
+            </div>
+            <div class="col-md-4">
+                <h5>Quick Links</h5>
+                <ul class="list-unstyled">
+                    <li><a href="/dashboard/" class="text-white-50 text-decoration-none">Dashboard</a></li>
+                    <li><a href="/add-lost/" class="text-white-50 text-decoration-none">Report Lost</a></li>
+                    <li><a href="/add-found/" class="text-white-50 text-decoration-none">Report Found</a></li>
+                </ul>
+            </div>
+            <div class="col-md-4">
+                <h5>Contact</h5>
+                <p class="text-white-50">
+                    <i class="bi bi-envelope"></i> support@lostfound.com<br>
+                    <i class="bi bi-telephone"></i> +1 234 567 890
+                </p>
+            </div>
+        </div>
+        <hr class="bg-white-50">
+        <div class="text-center">
+            <p class="mb-0 text-white-50">&copy; 2024 Lost & Found Management System. All rights reserved.</p>
+        </div>
+    </div>
+</footer>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+
+<script>
+    // Statistics Chart
+    const ctx = document.getElementById('statsChart').getContext('2d');
+    new Chart(ctx, {
+        type: 'bar',
+        data: {
+            labels: ['Lost Items', 'Found Items', 'Claimed', 'Unclaimed'],
+            datasets: [{
+                label: 'Number of Items',
+                data: [{{ lost_count }}, {{ found_count }}, {{ claimed_count }}, {{ unclaimed_count }}],
+                backgroundColor: [
+                    'rgba(220, 53, 69, 0.7)',
+                    'rgba(40, 167, 69, 0.7)',
+                    'rgba(0, 123, 255, 0.7)',
+                    'rgba(255, 193, 7, 0.7)'
+                ],
+                borderColor: [
+                    'rgb(220, 53, 69)',
+                    'rgb(40, 167, 69)',
+                    'rgb(0, 123, 255)',
+                    'rgb(255, 193, 7)'
+                ],
+                borderWidth: 2
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: true,
+            scales: {
+                y: {
+                    beginAtZero: true,
+                    ticks: {
+                        stepSize: 1
+                    }
+                }
+            },
+            plugins: {
+                legend: {
+                    position: 'top',
+                },
+                title: {
+                    display: false
+                }
+            }
+        }
+    });
+</script>
+
+</body>
+</html>

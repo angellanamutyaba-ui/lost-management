@@ -1,0 +1,321 @@
+{% extends 'base.html' %}
+
+{% block content %}
+
+<style>
+
+    body{
+        background-color: #f4f6f9;
+    }
+
+    .dashboard-title{
+        font-weight: bold;
+        color: #0d6efd;
+    }
+
+    .stats-card{
+        border: none;
+        border-radius: 15px;
+        transition: 0.3s;
+    }
+
+    .stats-card:hover{
+        transform: translateY(-5px);
+    }
+
+    .item-card{
+        border: none;
+        border-radius: 15px;
+        transition: 0.3s;
+    }
+
+    .item-card:hover{
+        transform: scale(1.02);
+    }
+
+    .item-image{
+        width: 100%;
+        height: 220px;
+        object-fit: cover;
+        border-radius: 10px;
+    }
+
+    .search-box{
+        border-radius: 12px;
+    }
+
+</style>
+
+<div class="container py-4">
+
+    <!-- HEADER -->
+    <div class="text-center mb-4">
+
+        <h2 class="dashboard-title">
+            Lost & Found Dashboard
+        </h2>
+
+        <p class="text-muted">
+            Professional Item Management System
+        </p>
+
+    </div>
+
+    <!-- STATS -->
+    <div class="row mb-4 text-center">
+
+        <div class="col-md-3 col-6 mb-3">
+
+            <div class="card stats-card shadow bg-danger text-white p-3">
+
+                <h6>Lost</h6>
+
+                <h3>{{ lost_count }}</h3>
+
+            </div>
+
+        </div>
+
+        <div class="col-md-3 col-6 mb-3">
+
+            <div class="card stats-card shadow bg-success text-white p-3">
+
+                <h6>Found</h6>
+
+                <h3>{{ found_count }}</h3>
+
+            </div>
+
+        </div>
+
+        <div class="col-md-3 col-6 mb-3">
+
+            <div class="card stats-card shadow bg-primary text-white p-3">
+
+                <h6>Claimed</h6>
+
+                <h3>{{ claimed_count }}</h3>
+
+            </div>
+
+        </div>
+
+        <div class="col-md-3 col-6 mb-3">
+
+            <div class="card stats-card shadow bg-dark text-white p-3">
+
+                <h6>Unclaimed</h6>
+
+                <h3>{{ unclaimed_count }}</h3>
+
+            </div>
+
+        </div>
+
+    </div>
+
+    <!-- SEARCH -->
+    <form method="GET" class="mb-5">
+
+        <div class="input-group shadow-sm">
+
+            <input type="text"
+                   name="q"
+                   value="{{ query }}"
+                   class="form-control search-box"
+                   placeholder="Search items...">
+
+            <button class="btn btn-primary">
+                Search
+            </button>
+
+            <a href="{% url 'dashboard' %}"
+               class="btn btn-secondary">
+
+               Clear
+
+            </a>
+
+        </div>
+
+    </form>
+
+    <div class="row">
+
+        <!-- LOST ITEMS -->
+        <div class="col-md-6">
+
+            <h4 class="text-danger fw-bold mb-4">
+                Lost Items
+            </h4>
+
+            {% for item in lost_items %}
+
+            <div class="card item-card shadow mb-4 p-3">
+
+                {% if item.image %}
+
+                <img src="{{ item.image.url }}"
+                     class="item-image mb-3">
+
+                {% endif %}
+
+                <h5 class="fw-bold">
+                    {{ item.name }}
+                </h5>
+
+                <p class="text-muted">
+                    {{ item.description }}
+                </p>
+
+                <small class="text-dark">
+                    <b>Location:</b> {{ item.location }}
+                </small>
+
+                <small class="text-muted d-block mb-2">
+                    <b>Date:</b> {{ item.date_lost }}
+                </small>
+
+                <div class="mt-2">
+
+                    {% if item.is_claimed %}
+
+                        <span class="badge bg-success">
+                            Claimed
+                        </span>
+
+                    {% else %}
+
+                        <span class="badge bg-warning text-dark">
+                            Unclaimed
+                        </span>
+
+                    {% endif %}
+
+                    {% if request.user.is_staff %}
+
+                        {% if not item.is_approved %}
+
+                            <a href="{% url 'approve_lost' item.id %}"
+                               class="btn btn-sm btn-success">
+
+                               Approve
+
+                            </a>
+
+                        {% endif %}
+
+                        <a href="{% url 'reject_lost' item.id %}"
+                           class="btn btn-sm btn-danger">
+
+                           Delete
+
+                        </a>
+
+                    {% endif %}
+
+                </div>
+
+            </div>
+
+            {% empty %}
+
+            <div class="alert alert-light shadow-sm">
+                No lost items found
+            </div>
+
+            {% endfor %}
+
+        </div>
+
+        <!-- FOUND ITEMS -->
+        <div class="col-md-6">
+
+            <h4 class="text-success fw-bold mb-4">
+                Found Items
+            </h4>
+
+            {% for item in found_items %}
+
+            <div class="card item-card shadow mb-4 p-3">
+
+                {% if item.image %}
+
+                <img src="{{ item.image.url }}"
+                     class="item-image mb-3">
+
+                {% endif %}
+
+                <h5 class="fw-bold">
+                    {{ item.name }}
+                </h5>
+
+                <p class="text-muted">
+                    {{ item.description }}
+                </p>
+
+                <small class="text-dark">
+                    <b>Location:</b> {{ item.location_found }}
+                </small>
+
+                <small class="text-muted d-block mb-2">
+                    <b>Date:</b> {{ item.date_found }}
+                </small>
+
+                <div class="mt-2">
+
+                    {% if item.is_claimed %}
+
+                        <span class="badge bg-success">
+                            Claimed
+                        </span>
+
+                    {% else %}
+
+                        <span class="badge bg-warning text-dark">
+                            Unclaimed
+                        </span>
+
+                    {% endif %}
+
+                    {% if request.user.is_staff %}
+
+                        {% if not item.is_approved %}
+
+                            <a href="{% url 'approve_found' item.id %}"
+                               class="btn btn-sm btn-success">
+
+                               Approve
+
+                            </a>
+
+                        {% endif %}
+
+                        <a href="{% url 'reject_found' item.id %}"
+                           class="btn btn-sm btn-danger">
+
+                           Delete
+
+                        </a>
+
+                    {% endif %}
+
+                </div>
+
+            </div>
+
+            {% empty %}
+
+            <div class="alert alert-light shadow-sm">
+                No found items found
+            </div>
+
+            {% endfor %}
+
+        </div>
+
+    </div>
+
+</div>
+
+{% endblock %}

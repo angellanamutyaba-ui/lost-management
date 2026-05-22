@@ -1,0 +1,255 @@
+from django.shortcuts import render, redirect, get_object_or_404
+from django.contrib.auth.decorators import login_required
+from django.contrib.admin.views.decorators import staff_member_required
+from django.contrib.auth.forms import UserCreationForm
+from django.contrib.auth import login, logout, authenticate
+from django.contrib import messages
+from django.contrib.auth.models import User
+
+from .models import LostItem, FoundItem
+
+
+# HOME PAGE
+def home(request):
+    # Get counts for dashboard
+    lost_count = LostItem.objects.filter(is_approved=True).count()
+    found_count = FoundItem.objects.filter(is_approved=True).count()
+    claimed_count = LostItem.objects.filter(is_approved=True, is_claimed=True).count() + \
+                   FoundItem.objects.filter(is_approved=True, is_claimed=True).count()
+    unclaimed_count = LostItem.objects.filter(is_approved=True, is_claimed=False).count() + \
+                     FoundItem.objects.filter(is_approved=True, is_claimed=False).count()
+    
+    # Get recent items for display
+    lost_items = LostItem.objects.filter(is_approved=True).order_by('-created_at')[:6]
+    found_items = FoundItem.objects.filter(is_approved=True).order_by('-created_at')[:6]
+    
+    context = {
+        'lost_items': lost_items,
+        'found_items': found_items,
+        'lost_count': lost_count,
+        'found_count': found_count,
+        'claimed_count': claimed_count,
+        'unclaimed_count': unclaimed_count,
+        'query': '',
+    }
+    return render(request, 'home.html', context)
+
+
+# LOGIN VIEW
+def login_user(request):
+    if request.method == 'POST':
+        username = request.POST.get('username')
+        password = request.POST.get('password')
+        user = authenticate(request, username=username, password=password)
+        
+        if user is not None:
+            login(request, user)
+            messages.success(request, f"Welcome back, {username}!")
+            return redirect('dashboard')
+        else:
+            messages.error(request, "Invalid username or password!")
+    
+    return render(request, 'login.html')
+
+
+# REGISTER
+def register(request):
+    if request.method == 'POST':
+        username = request.POST.get('username')
+        email = request.POST.get('email')
+        password = request.POST.get('password')
+        
+        # Check if username exists
+        if User.objects.filter(username=username).exists():
+            messages.error(request, "Username already exists!")
+        else:
+            # Create user
+            user = User.objects.create_user(
+                username=username,
+                email=email,
+                password=password
+            )
+            login(request, user)
+            messages.success(request, "Account created successfully!")
+            return redirect('dashboard')
+    
+    return render(request, 'register.html')
+
+
+# LOGOUT
+def logout_user(request):
+    logout(request)
+    messages.success(request, "Logged out successfully!")
+    return redirect('home')
+
+
+# DASHBOARD
+@login_required
+def dashboard(request):
+    query = request.GET.get('q')
+    
+    # Show different items based on user type
+    if request.user.is_staff:
+        lost_items = LostItem.objects.all().order_by('-created_at')
+        found_items = FoundItem.objects.all().order_by('-created_at')
+    else:
+        lost_items = LostItem.objects.filter(is_approved=True).order_by('-created_at')
+        found_items = FoundItem.objects.filter(is_approved=True).order_by('-created_at')
+    
+    # Search functionality
+    if query:
+        lost_items = lost_items.filter(name__icontains=query)
+        found_items = found_items.filter(name__icontains=query)
+    
+    # Count statistics
+    lost_count = lost_items.count()
+    found_count = found_items.count()
+    claimed_count = lost_items.filter(is_claimed=True).count() + found_items.filter(is_claimed=True).count()
+    unclaimed_count = lost_items.filter(is_claimed=False).count() + found_items.filter(is_claimed=False).count()
+    
+    # Pending approvals for staff
+    pending_approvals = 0
+    if request.user.is_staff:
+        pending_approvals = LostItem.objects.filter(is_approved=False).count() + \
+                           FoundItem.objects.filter(is_approved=False).count()
+    
+    context = {
+        'lost_items': lost_items,
+        'found_items': found_items,
+        'lost_count': lost_count,
+        'found_count': found_count,
+        'claimed_count': claimed_count,
+        'unclaimed_count': unclaimed_count,
+        'query': query,
+        'pending_approvals': pending_approvals,
+    }
+    
+    return render(request, 'dashboard.html', context)
+
+
+# ADD LOST ITEM
+@login_required
+def add_lost(request):
+    if request.method == 'POST':
+        LostItem.objects.create(
+            user=request.user,
+            name=request.POST.get('name'),
+            description=request.POST.get('description'),
+            location=request.POST.get('location'),
+            date_lost=request.POST.get('date_lost'),
+            image=request.FILES.get('image'),
+            is_approved=False,  # Needs admin approval
+        )
+        messages.success(request, "Lost item submitted for admin approval!")
+        return redirect('dashboard')
+    
+    return render(request, 'add_lost.html')
+
+
+# ADD FOUND ITEM
+@login_required
+def add_found(request):
+    if request.method == 'POST':
+        FoundItem.objects.create(
+            user=request.user,
+            name=request.POST.get('name'),
+            description=request.POST.get('description'),
+            location_found=request.POST.get('location_found'),  # Fixed field name
+            date_found=request.POST.get('date_found'),
+            image=request.FILES.get('image'),
+            is_approved=False,  # Needs admin approval
+        )
+        messages.success(request, "Found item submitted for admin approval!")
+        return redirect('dashboard')
+    
+    return render(request, 'add_found.html')
+
+
+# CLAIM LOST ITEM
+@login_required
+def claim_lost(request, id):
+    item = get_object_or_404(LostItem, id=id, is_approved=True)
+    
+    if not item.is_claimed:
+        item.is_claimed = True
+        item.save()
+        messages.success(request, f"'{item.name}' has been marked as claimed!")
+    else:
+        messages.warning(request, "This item has already been claimed!")
+    
+    return redirect('dashboard')
+
+
+# CLAIM FOUND ITEM
+@login_required
+def claim_found(request, id):
+    item = get_object_or_404(FoundItem, id=id, is_approved=True)
+    
+    if not item.is_claimed:
+        item.is_claimed = True
+        item.save()
+        messages.success(request, f"'{item.name}' has been marked as claimed!")
+    else:
+        messages.warning(request, "This item has already been claimed!")
+    
+    return redirect('dashboard')
+
+
+# DELETE LOST ITEM
+@staff_member_required
+def delete_lost(request, id):
+    item = get_object_or_404(LostItem, id=id)
+    item_name = item.name
+    item.delete()
+    messages.success(request, f"Lost item '{item_name}' deleted successfully!")
+    return redirect('dashboard')
+
+
+# DELETE FOUND ITEM
+@staff_member_required
+def delete_found(request, id):
+    item = get_object_or_404(FoundItem, id=id)
+    item_name = item.name
+    item.delete()
+    messages.success(request, f"Found item '{item_name}' deleted successfully!")
+    return redirect('dashboard')
+
+
+# APPROVE LOST ITEM
+@staff_member_required
+def approve_lost(request, id):
+    item = get_object_or_404(LostItem, id=id)
+    item.is_approved = True
+    item.save()
+    messages.success(request, f"Lost item '{item.name}' has been approved!")
+    return redirect('dashboard')
+
+
+# REJECT LOST ITEM
+@staff_member_required
+def reject_lost(request, id):
+    item = get_object_or_404(LostItem, id=id)
+    item_name = item.name
+    item.delete()
+    messages.success(request, f"Lost item '{item_name}' has been rejected and removed!")
+    return redirect('dashboard')
+
+
+# APPROVE FOUND ITEM
+@staff_member_required
+def approve_found(request, id):
+    item = get_object_or_404(FoundItem, id=id)
+    item.is_approved = True
+    item.save()
+    messages.success(request, f"Found item '{item.name}' has been approved!")
+    return redirect('dashboard')
+
+
+# REJECT FOUND ITEM
+@staff_member_required
+def reject_found(request, id):
+    item = get_object_or_404(FoundItem, id=id)
+    item_name = item.name
+    item.delete()
+    messages.success(request, f"Found item '{item_name}' has been rejected and removed!")
+    return redirect('dashboard')
