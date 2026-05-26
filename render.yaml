@@ -1,11 +1,11 @@
-services: 
-  - type: web 
-    name: lost-management 
-    runtime: python 
-    buildCommand: pip install -r requirements.txt 
-    startCommand: gunicorn lost_management.wsgi:application 
-    envVars: 
-      - key: DISABLE_COLLECTSTATIC 
-        value: 1 
-      - key: DEBUG 
-        value: False 
+services:
+  - type: web
+    name: lost-management
+    runtime: python
+    buildCommand: "pip install -r requirements.txt"
+    startCommand: "gunicorn lost_management.wsgi:application"
+    envVars:
+      - key: DISABLE_COLLECTSTATIC
+        value: 1
+      - key: DEBUG
+        value: False
