@@ -28,4 +28,9 @@ urlpatterns = [
     path('approve-found/<int:id>/', views.approve_found, name='approve_found'),
     path('reject-found/<int:id>/', views.reject_found, name='reject_found'),
     path('delete-found/<int:id>/', views.delete_found, name='delete_found'),
+    
+    # Notifications
+    path('notifications/', views.notifications_view, name='notifications'),
+    path('notifications/mark/<int:id>/', views.mark_notification_read, name='mark_notification_read'),
+    path('alert-preferences/', views.alert_preferences, name='alert_preferences'),
 ]

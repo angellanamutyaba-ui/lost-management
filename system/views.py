@@ -6,7 +6,8 @@ from django.contrib.auth import login, logout, authenticate
 from django.contrib import messages
 from django.contrib.auth.models import User
 
-from .models import LostItem, FoundItem
+from .models import LostItem, FoundItem, Notification, AlertPreference
+from .notifications import notify_item_approved, notify_item_rejected, notify_item_claimed
 
 
 # HOME PAGE
@@ -69,6 +70,8 @@ def register(request):
                 email=email,
                 password=password
             )
+            # Create alert preferences for new user
+            AlertPreference.objects.create(user=user)
             login(request, user)
             messages.success(request, "Account created successfully!")
             return redirect('dashboard')
@@ -113,6 +116,9 @@ def dashboard(request):
         pending_approvals = LostItem.objects.filter(is_approved=False).count() + \
                            FoundItem.objects.filter(is_approved=False).count()
     
+    # Get unread notifications count
+    unread_notifications = Notification.objects.filter(user=request.user, is_read=False).count()
+    
     context = {
         'lost_items': lost_items,
         'found_items': found_items,
@@ -122,6 +128,7 @@ def dashboard(request):
         'unclaimed_count': unclaimed_count,
         'query': query,
         'pending_approvals': pending_approvals,
+        'unread_notifications': unread_notifications,
     }
     
     return render(request, 'dashboard.html', context)
@@ -154,7 +161,7 @@ def add_found(request):
             user=request.user,
             name=request.POST.get('name'),
             description=request.POST.get('description'),
-            location_found=request.POST.get('location_found'),  # Fixed field name
+            location_found=request.POST.get('location_found'),
             date_found=request.POST.get('date_found'),
             image=request.FILES.get('image'),
             is_approved=False,  # Needs admin approval
@@ -173,6 +180,7 @@ def claim_lost(request, id):
     if not item.is_claimed:
         item.is_claimed = True
         item.save()
+        notify_item_claimed(item, is_lost=True, claimer=request.user)
         messages.success(request, f"'{item.name}' has been marked as claimed!")
     else:
         messages.warning(request, "This item has already been claimed!")
@@ -188,6 +196,7 @@ def claim_found(request, id):
     if not item.is_claimed:
         item.is_claimed = True
         item.save()
+        notify_item_claimed(item, is_lost=False, claimer=request.user)
         messages.success(request, f"'{item.name}' has been marked as claimed!")
     else:
         messages.warning(request, "This item has already been claimed!")
@@ -221,6 +230,7 @@ def approve_lost(request, id):
     item = get_object_or_404(LostItem, id=id)
     item.is_approved = True
     item.save()
+    notify_item_approved(item, is_lost=True)
     messages.success(request, f"Lost item '{item.name}' has been approved!")
     return redirect('dashboard')
 
@@ -230,8 +240,9 @@ def approve_lost(request, id):
 def reject_lost(request, id):
     item = get_object_or_404(LostItem, id=id)
     item_name = item.name
+    notify_item_rejected(item, is_lost=True)
     item.delete()
-    messages.success(request, f"Lost item '{item_name}' has been rejected and removed!")
+    messages.success(request, f"Lost item '{item_name}' has been rejected!")
     return redirect('dashboard')
 
 
@@ -241,6 +252,7 @@ def approve_found(request, id):
     item = get_object_or_404(FoundItem, id=id)
     item.is_approved = True
     item.save()
+    notify_item_approved(item, is_lost=False)
     messages.success(request, f"Found item '{item.name}' has been approved!")
     return redirect('dashboard')
 
@@ -250,6 +262,58 @@ def approve_found(request, id):
 def reject_found(request, id):
     item = get_object_or_404(FoundItem, id=id)
     item_name = item.name
+    notify_item_rejected(item, is_lost=False)
     item.delete()
-    messages.success(request, f"Found item '{item_name}' has been rejected and removed!")
+    messages.success(request, f"Found item '{item_name}' has been rejected!")
     return redirect('dashboard')
+
+
+# NOTIFICATION VIEWS
+@login_required
+def notifications_view(request):
+    """View all notifications"""
+    notifications = Notification.objects.filter(user=request.user)
+    
+    if request.GET.get('mark_read'):
+        notifications.update(is_read=True)
+        messages.success(request, "All notifications marked as read!")
+        return redirect('notifications')
+    
+    if request.GET.get('clear_all'):
+        notifications.delete()
+        messages.success(request, "All notifications cleared!")
+        return redirect('notifications')
+    
+    unread_count = notifications.filter(is_read=False).count()
+    
+    return render(request, 'notifications.html', {
+        'notifications': notifications,
+        'unread_count': unread_count,
+    })
+
+
+@login_required
+def mark_notification_read(request, id):
+    """Mark a single notification as read"""
+    notification = get_object_or_404(Notification, id=id, user=request.user)
+    notification.is_read = True
+    notification.save()
+    return redirect(notification.link or 'notifications')
+
+
+@login_required
+def alert_preferences(request):
+    """Manage alert preferences"""
+    prefs, created = AlertPreference.objects.get_or_create(user=request.user)
+    
+    if request.method == 'POST':
+        prefs.email_notifications = request.POST.get('email_notifications') == 'on'
+        prefs.in_app_notifications = request.POST.get('in_app_notifications') == 'on'
+        prefs.match_alerts = request.POST.get('match_alerts') == 'on'
+        prefs.approval_alerts = request.POST.get('approval_alerts') == 'on'
+        prefs.claim_alerts = request.POST.get('claim_alerts') == 'on'
+        prefs.save()
+        messages.success(request, "Notification preferences updated!")
+        return redirect('alert_preferences')
+    
+    return render(request, 'alert_preferences.html', {'prefs': prefs})
