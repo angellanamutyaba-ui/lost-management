@@ -317,3 +317,96 @@ def alert_preferences(request):
         return redirect('alert_preferences')
     
     return render(request, 'alert_preferences.html', {'prefs': prefs})
+
+# ========== USER MANAGEMENT FUNCTIONS ==========
+@staff_member_required
+def user_management(request):
+    """Admin page to manage all users"""
+    from django.contrib.auth.models import User
+    users = User.objects.all().order_by('-date_joined')
+    
+    for user in users:
+        user.lost_count = LostItem.objects.filter(user=user).count()
+        user.found_count = FoundItem.objects.filter(user=user).count()
+        user.notification_count = Notification.objects.filter(user=user, is_read=False).count()
+    
+    context = {
+        'users': users,
+        'total_users': users.count(),
+        'active_users': users.filter(is_active=True).count(),
+        'staff_users': users.filter(is_staff=True).count(),
+        'inactive_users': users.filter(is_active=False).count(),
+    }
+    return render(request, 'user_management.html', context)
+
+
+@staff_member_required
+def toggle_user_status(request, id):
+    """Activate or deactivate a user"""
+    from django.contrib.auth.models import User
+    user = get_object_or_404(User, id=id)
+    
+    if user == request.user:
+        messages.error(request, "You cannot change your own status!")
+        return redirect('user_management')
+    
+    user.is_active = not user.is_active
+    user.save()
+    status = "activated" if user.is_active else "deactivated"
+    messages.success(request, f"User '{user.username}' has been {status}!")
+    return redirect('user_management')
+
+
+@staff_member_required
+def make_staff(request, id):
+    """Make a user staff member"""
+    from django.contrib.auth.models import User
+    user = get_object_or_404(User, id=id)
+    
+    if user == request.user:
+        messages.error(request, "You cannot change your own staff status!")
+        return redirect('user_management')
+    
+    user.is_staff = not user.is_staff
+    user.save()
+    role = "staff member" if user.is_staff else "regular user"
+    messages.success(request, f"User '{user.username}' is now a {role}!")
+    return redirect('user_management')
+
+
+@staff_member_required
+def delete_user(request, id):
+    """Delete a user account"""
+    from django.contrib.auth.models import User
+    user = get_object_or_404(User, id=id)
+    
+    if user == request.user:
+        messages.error(request, "You cannot delete your own account!")
+        return redirect('user_management')
+    
+    username = user.username
+    user.delete()
+    messages.success(request, f"User '{username}' has been deleted!")
+    return redirect('user_management')
+
+
+@staff_member_required
+def user_detail(request, id):
+    """View user details"""
+    from django.contrib.auth.models import User
+    user = get_object_or_404(User, id=id)
+    
+    lost_items = LostItem.objects.filter(user=user).order_by('-created_at')
+    found_items = FoundItem.objects.filter(user=user).order_by('-created_at')
+    notifications = Notification.objects.filter(user=user).order_by('-created_at')[:10]
+    
+    context = {
+        'user_detail': user,
+        'lost_items': lost_items,
+        'found_items': found_items,
+        'notifications': notifications,
+        'lost_count': lost_items.count(),
+        'found_count': found_items.count(),
+        'unread_notifications': Notification.objects.filter(user=user, is_read=False).count(),
+    }
+    return render(request, 'user_detail.html', context)

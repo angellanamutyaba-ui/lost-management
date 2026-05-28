@@ -1,0 +1,62 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<style>
+    .stat-box {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        border-radius: 10px;
+        padding: 15px;
+        text-align: center;
+    }
+</style>
+
+<div class="container mt-4">
+    <div class="card shadow">
+        <div class="card-header bg-primary text-white">
+            <h3><i class="bi bi-people-fill"></i> User Management</h3>
+        </div>
+        <div class="card-body">
+            <div class="row mb-4 g-3">
+                <div class="col-md-3"><div class="stat-box"><h2>{{ total_users }}</h2><p>Total Users</p></div></div>
+                <div class="col-md-3"><div class="stat-box" style="background:#28a745"><h2>{{ active_users }}</h2><p>Active</p></div></div>
+                <div class="col-md-3"><div class="stat-box" style="background:#ffc107;color:#333"><h2>{{ staff_users }}</h2><p>Staff</p></div></div>
+                <div class="col-md-3"><div class="stat-box" style="background:#dc3545"><h2>{{ inactive_users }}</h2><p>Inactive</p></div></div>
+            </div>
+            
+            <div class="mb-3"><input type="text" id="search" class="form-control" placeholder="Search users..."></div>
+            
+            <div class="table-responsive">
+                <table class="table table-hover" id="userTable">
+                    <thead class="table-dark"><tr><th>Username</th><th>Email</th><th>Lost</th><th>Found</th><th>Status</th><th>Role</th><th>Actions</th></tr></thead>
+                    <tbody>
+                        {% for user in users %}
+                        <tr>
+                            <td><a href="{% url 'user_detail' user.id %}">{{ user.username }}</a></td>
+                            <td>{{ user.email|default:"-" }}</td>
+                            <td>{{ user.lost_count }}</td>
+                            <td>{{ user.found_count }}</td>
+                            <td>{% if user.is_active %}<span class="badge bg-success">Active</span>{% else %}<span class="badge bg-danger">Inactive</span>{% endif %}</td>
+                            <td>{% if user.is_staff %}<span class="badge bg-primary">Staff</span>{% else %}<span class="badge bg-secondary">User</span>{% endif %}</td>
+                            <td>
+                                {% if user != request.user %}
+                                <a href="{% url 'toggle_user_status' user.id %}" class="btn btn-sm btn-warning">{% if user.is_active %}Deactivate{% else %}Activate{% endif %}</a>
+                                <a href="{% url 'delete_user' user.id %}" class="btn btn-sm btn-danger" onclick="return confirm('Delete?')">Delete</a>
+                                {% else %}<span class="text-muted">You</span>{% endif %}
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+<script>
+document.getElementById('search').addEventListener('keyup', function() {
+    let filter = this.value.toLowerCase();
+    let rows = document.querySelectorAll('#userTable tbody tr');
+    rows.forEach(row => { row.style.display = row.textContent.toLowerCase().includes(filter) ? '' : 'none'; });
+});
+</script>
+{% endblock %}

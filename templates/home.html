@@ -16,9 +16,23 @@
     <style>
         body {
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
             min-height: 100vh;
         }
         
+        /* Modern Navbar */
+        .navbar {
+            background: rgba(26, 26, 46, 0.95) !important;
+            backdrop-filter: blur(10px);
+            box-shadow: 0 2px 15px rgba(0,0,0,0.2);
+        }
+        
+        .navbar-brand {
+            font-weight: 700;
+            font-size: 1.5rem;
+        }
+        
+        /* Hero Section */
         .hero-section {
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             color: white;
@@ -26,86 +40,189 @@
             margin-top: -20px;
         }
         
-        .feature-card {
-            transition: transform 0.3s ease, box-shadow 0.3s ease;
-            border: none;
-            border-radius: 15px;
-            overflow: hidden;
-        }
-        
-        .feature-card:hover {
-            transform: translateY(-10px);
-            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
-        }
-        
+        /* Stats Cards */
         .stats-card {
             border: none;
             border-radius: 15px;
-            cursor: pointer;
             transition: all 0.3s ease;
+            background: rgba(255,255,255,0.95);
+            box-shadow: 0 5px 20px rgba(0,0,0,0.1);
         }
         
         .stats-card:hover {
-            transform: scale(1.05);
+            transform: translateY(-5px);
+            box-shadow: 0 10px 30px rgba(0,0,0,0.15);
         }
         
-        .item-card {
-            transition: transform 0.3s ease;
+        .stats-card .icon {
+            font-size: 2.5rem;
+            margin-bottom: 15px;
+        }
+        
+        .stats-card h3 {
+            font-size: 2rem;
+            font-weight: 700;
+            margin-bottom: 5px;
+            color: #1a1a2e;
+        }
+        
+        .stats-card p {
+            color: #666;
+            margin-bottom: 0;
+        }
+        
+        /* Feature Cards */
+        .feature-card {
             border: none;
-            border-radius: 12px;
+            border-radius: 15px;
+            transition: all 0.3s ease;
+            background: rgba(255,255,255,0.95);
+            box-shadow: 0 5px 20px rgba(0,0,0,0.1);
+            text-align: center;
+            padding: 30px 20px;
+        }
+        
+        .feature-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 30px rgba(0,0,0,0.15);
+        }
+        
+        .feature-icon {
+            font-size: 3rem;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+            margin-bottom: 20px;
+        }
+        
+        .feature-card h4 {
+            font-size: 1.3rem;
+            font-weight: 600;
+            margin-bottom: 15px;
+            color: #1a1a2e;
+        }
+        
+        .feature-card p {
+            color: #666;
+            line-height: 1.6;
+        }
+        
+        /* Item Cards */
+        .item-card {
+            border: none;
+            border-radius: 15px;
+            transition: all 0.3s ease;
+            background: rgba(255,255,255,0.95);
+            box-shadow: 0 5px 20px rgba(0,0,0,0.1);
             overflow: hidden;
         }
         
         .item-card:hover {
             transform: translateY(-5px);
-            box-shadow: 0 5px 20px rgba(0,0,0,0.15);
+            box-shadow: 0 10px 30px rgba(0,0,0,0.15);
         }
         
         .item-image {
             height: 200px;
             object-fit: cover;
-        }
-        
-        .navbar {
-            background: rgba(255,255,255,0.95) !important;
-            backdrop-filter: blur(10px);
-            box-shadow: 0 2px 20px rgba(0,0,0,0.1);
-        }
-        
-        .btn-gradient {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            border: none;
-            color: white;
-            transition: transform 0.3s ease;
-        }
-        
-        .btn-gradient:hover {
-            transform: translateY(-2px);
-            color: white;
+            width: 100%;
         }
         
         .section-title {
+            font-size: 1.8rem;
+            font-weight: 700;
+            margin-bottom: 30px;
+            color: white;
+            text-shadow: 1px 1px 2px rgba(0,0,0,0.1);
             position: relative;
-            margin-bottom: 40px;
-            font-weight: bold;
+            display: inline-block;
         }
         
         .section-title:after {
             content: '';
             position: absolute;
             bottom: -10px;
-            left: 50%;
-            transform: translateX(-50%);
-            width: 60px;
+            left: 0;
+            width: 50px;
             height: 3px;
+            background: white;
+            border-radius: 2px;
+        }
+        
+        .btn-custom {
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border-radius: 10px;
+            padding: 12px 30px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            border: none;
+        }
+        
+        .btn-custom:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+            color: white;
+        }
+        
+        .btn-outline-custom {
+            border: 2px solid white;
+            background: transparent;
+            color: white;
+            border-radius: 10px;
+            padding: 12px 30px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+        
+        .btn-outline-custom:hover {
+            background: white;
+            color: #667eea;
+            transform: translateY(-2px);
+        }
+        
+        .search-card {
+            background: rgba(255,255,255,0.95);
+            border-radius: 15px;
+            padding: 30px;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.1);
         }
         
         .footer {
-            background: #2d3748;
+            background: rgba(26, 26, 46, 0.95);
             color: white;
-            padding: 40px 0 20px;
+            padding: 50px 0 20px;
             margin-top: 60px;
+        }
+        
+        .footer a {
+            color: #aaa;
+            text-decoration: none;
+            transition: color 0.3s ease;
+        }
+        
+        .footer a:hover {
+            color: white;
+        }
+        
+        .contact-number {
+            font-size: 1.2rem;
+            font-weight: 600;
+            color: white;
+        }
+        
+        .contact-number a {
+            color: white;
+        }
+        
+        .contact-number a:hover {
+            color: #667eea;
+        }
+        
+        .stat-card-bg {
+            background: rgba(255,255,255,0.95);
+            border-radius: 15px;
         }
         
         @keyframes fadeIn {
@@ -116,6 +233,17 @@
         .fade-in {
             animation: fadeIn 0.6s ease-out;
         }
+        
+        .bg-gradient-custom {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        }
+        
+        .text-gradient {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+        }
     </style>
 </head>
 
@@ -124,9 +252,9 @@
 <!-- NAVBAR -->
 <nav class="navbar navbar-expand-lg sticky-top">
     <div class="container">
-        <a class="navbar-brand fw-bold text-primary" href="/">
+        <a class="navbar-brand text-white" href="/">
             <i class="bi bi-search-heart me-2"></i>
-            Lost & Found System
+            Lost Management System
         </a>
         
         <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
@@ -136,14 +264,14 @@
         <div class="collapse navbar-collapse" id="navbarNav">
             <ul class="navbar-nav ms-auto align-items-center">
                 <li class="nav-item">
-                    <a class="nav-link fw-bold" href="/dashboard/">
+                    <a class="nav-link text-white-50" href="/dashboard/">
                         <i class="bi bi-speedometer2"></i> Dashboard
                     </a>
                 </li>
                 
                 {% if user.is_authenticated %}
                 <li class="nav-item dropdown">
-                    <a class="nav-link dropdown-toggle fw-bold" href="#" role="button" data-bs-toggle="dropdown">
+                    <a class="nav-link dropdown-toggle text-white-50" href="#" role="button" data-bs-toggle="dropdown">
                         <i class="bi bi-plus-circle"></i> Report Item
                     </a>
                     <ul class="dropdown-menu">
@@ -155,19 +283,24 @@
                         </a></li>
                     </ul>
                 </li>
+                <li class="nav-item">
+                    <a class="nav-link position-relative text-white-50" href="/notifications/">
+                        <i class="bi bi-bell"></i>
+                    </a>
+                </li>
                 <li class="nav-item ms-2">
-                    <a class="btn btn-outline-danger" href="/logout/">
+                    <a class="btn btn-danger btn-sm" href="/logout/">
                         <i class="bi bi-box-arrow-right"></i> Logout
                     </a>
                 </li>
                 {% else %}
                 <li class="nav-item">
-                    <a class="btn btn-outline-primary me-2" href="/login/">
+                    <a class="btn btn-outline-light btn-sm me-2" href="/login/">
                         <i class="bi bi-box-arrow-in-right"></i> Login
                     </a>
                 </li>
                 <li class="nav-item">
-                    <a class="btn btn-gradient" href="/register/">
+                    <a class="btn btn-light btn-sm" href="/register/">
                         <i class="bi bi-person-plus"></i> Register
                     </a>
                 </li>
@@ -181,14 +314,14 @@
 <div class="hero-section fade-in">
     <div class="container text-center">
         <h1 class="display-4 fw-bold mb-4">
-            <i class="bi bi-search-heart"></i> Lost & Found Management System
+            <i class="bi bi-search-heart"></i> Lost Management System
         </h1>
-        <p class="lead mb-4">Help reunite lost items with their owners quickly and efficiently</p>
+        <p class="lead mb-4">Efficiently manage and track lost items. Helping you reunite with what matters most.</p>
         
         {% if not user.is_authenticated %}
         <div class="mt-4">
             <a href="/register/" class="btn btn-light btn-lg me-3">
-                <i class="bi bi-person-plus"></i> Get Started Free
+                <i class="bi bi-person-plus"></i> Get Started
             </a>
             <a href="/login/" class="btn btn-outline-light btn-lg">
                 <i class="bi bi-box-arrow-in-right"></i> Login
@@ -207,32 +340,40 @@
 <!-- STATISTICS SECTION -->
 <div class="container mt-5">
     <div class="row g-4">
-        <div class="col-md-3">
-            <div class="card stats-card bg-danger text-white shadow-lg text-center p-4">
-                <i class="bi bi-emoji-frown display-1"></i>
-                <h3 class="mt-3">{{ lost_count }}</h3>
-                <h6>Lost Items Reported</h6>
+        <div class="col-md-3 col-6">
+            <div class="stats-card text-center p-4">
+                <div class="icon text-danger">
+                    <i class="bi bi-emoji-frown"></i>
+                </div>
+                <h3>{{ lost_count }}</h3>
+                <p>Lost Items</p>
             </div>
         </div>
-        <div class="col-md-3">
-            <div class="card stats-card bg-success text-white shadow-lg text-center p-4">
-                <i class="bi bi-emoji-smile display-1"></i>
-                <h3 class="mt-3">{{ found_count }}</h3>
-                <h6>Found Items Reported</h6>
+        <div class="col-md-3 col-6">
+            <div class="stats-card text-center p-4">
+                <div class="icon text-success">
+                    <i class="bi bi-emoji-smile"></i>
+                </div>
+                <h3>{{ found_count }}</h3>
+                <p>Found Items</p>
             </div>
         </div>
-        <div class="col-md-3">
-            <div class="card stats-card bg-primary text-white shadow-lg text-center p-4">
-                <i class="bi bi-gift display-1"></i>
-                <h3 class="mt-3">{{ claimed_count }}</h3>
-                <h6>Successfully Claimed</h6>
+        <div class="col-md-3 col-6">
+            <div class="stats-card text-center p-4">
+                <div class="icon text-primary">
+                    <i class="bi bi-gift"></i>
+                </div>
+                <h3>{{ claimed_count }}</h3>
+                <p>Successfully Claimed</p>
             </div>
         </div>
-        <div class="col-md-3">
-            <div class="card stats-card bg-warning text-dark shadow-lg text-center p-4">
-                <i class="bi bi-clock-history display-1"></i>
-                <h3 class="mt-3">{{ unclaimed_count }}</h3>
-                <h6>Awaiting Claim</h6>
+        <div class="col-md-3 col-6">
+            <div class="stats-card text-center p-4">
+                <div class="icon text-warning">
+                    <i class="bi bi-clock-history"></i>
+                </div>
+                <h3>{{ unclaimed_count }}</h3>
+                <p>Awaiting Claim</p>
             </div>
         </div>
     </div>
@@ -240,33 +381,33 @@
 
 <!-- HOW IT WORKS -->
 <div class="container mt-5">
-    <h2 class="text-center section-title">How It Works</h2>
+    <h2 class="section-title">How It Works</h2>
     <div class="row mt-4 g-4">
         <div class="col-md-4">
-            <div class="card feature-card shadow text-center p-4">
-                <div class="text-center">
-                    <i class="bi bi-pencil-square display-1 text-primary"></i>
+            <div class="feature-card">
+                <div class="feature-icon">
+                    <i class="bi bi-pencil-square"></i>
                 </div>
-                <h4 class="mt-3">1. Report Item</h4>
-                <p class="text-muted">Report lost or found items with details, location, and photos</p>
+                <h4>1. Report Item</h4>
+                <p>Report lost or found items with details, location, and photos</p>
             </div>
         </div>
         <div class="col-md-4">
-            <div class="card feature-card shadow text-center p-4">
-                <div class="text-center">
-                    <i class="bi bi-clock-history display-1 text-warning"></i>
+            <div class="feature-card">
+                <div class="feature-icon">
+                    <i class="bi bi-clock-history"></i>
                 </div>
-                <h4 class="mt-3">2. Wait for Approval</h4>
-                <p class="text-muted">Our team reviews and approves items to ensure quality</p>
+                <h4>2. Wait for Approval</h4>
+                <p>Our team reviews and approves items to ensure quality</p>
             </div>
         </div>
         <div class="col-md-4">
-            <div class="card feature-card shadow text-center p-4">
-                <div class="text-center">
-                    <i class="bi bi-hand-thumbs-up display-1 text-success"></i>
+            <div class="feature-card">
+                <div class="feature-icon">
+                    <i class="bi bi-hand-thumbs-up"></i>
                 </div>
-                <h4 class="mt-3">3. Claim & Reunite</h4>
-                <p class="text-muted">Owners can claim their items and get reunited</p>
+                <h4>3. Claim & Reunite</h4>
+                <p>Owners can claim their items and get reunited</p>
             </div>
         </div>
     </div>
@@ -274,15 +415,15 @@
 
 <!-- SEARCH SECTION -->
 <div class="container mt-5">
-    <div class="card shadow-lg p-4 bg-white">
-        <h3 class="text-center mb-4">
+    <div class="search-card">
+        <h3 class="mb-4">
             <i class="bi bi-search"></i> Search for Items
         </h3>
         <form method="GET">
             <div class="input-group">
                 <input type="text" name="q" class="form-control form-control-lg" 
                        placeholder="Search by item name, description, or location..." value="{{ query }}">
-                <button class="btn btn-gradient btn-lg" type="submit">
+                <button class="btn btn-custom btn-lg" type="submit">
                     <i class="bi bi-search"></i> Search
                 </button>
             </div>
@@ -292,40 +433,39 @@
 
 <!-- RECENT LOST ITEMS -->
 <div class="container mt-5">
-    <h2 class="text-center section-title">Recently Lost Items</h2>
+    <h2 class="section-title">Recently Lost Items</h2>
     <div class="row">
         {% for item in lost_items %}
         <div class="col-md-4 mb-4">
-            <div class="card item-card shadow h-100">
+            <div class="item-card h-100">
                 {% if item.image %}
                 <img src="{{ item.image.url }}" class="item-image">
                 {% else %}
-                <div class="item-image bg-secondary d-flex align-items-center justify-content-center">
-                    <i class="bi bi-image display-1 text-white"></i>
+                <div class="item-image bg-gradient-custom d-flex align-items-center justify-content-center">
+                    <i class="bi bi-image display-1 text-white-50"></i>
                 </div>
                 {% endif %}
-                <div class="card-body">
-                    <h5 class="fw-bold text-danger">
-                        <i class="bi bi-exclamation-triangle"></i> {{ item.name }}
+                <div class="card-body p-4">
+                    <h5 class="fw-bold">
+                        <i class="bi bi-exclamation-triangle text-danger"></i> {{ item.name }}
                     </h5>
                     <p class="text-muted">{{ item.description|truncatewords:20 }}</p>
                     <div class="mt-3">
-                        <small class="text-muted">
+                        <small class="text-muted d-block">
                             <i class="bi bi-geo-alt"></i> {{ item.location }}
                         </small>
-                        <br>
-                        <small class="text-muted">
+                        <small class="text-muted d-block">
                             <i class="bi bi-calendar"></i> Lost: {{ item.date_lost }}
                         </small>
                     </div>
                 </div>
-                <div class="card-footer bg-white border-0 pb-3">
+                <div class="card-footer bg-white border-0 pb-4">
                     {% if item.is_claimed %}
-                    <span class="badge bg-success">
+                    <span class="badge bg-success px-3 py-2">
                         <i class="bi bi-check-circle"></i> Claimed
                     </span>
                     {% else %}
-                    <span class="badge bg-warning text-dark">
+                    <span class="badge bg-warning text-dark px-3 py-2">
                         <i class="bi bi-clock"></i> Not Claimed
                     </span>
                     {% endif %}
@@ -334,8 +474,9 @@
         </div>
         {% empty %}
         <div class="col-12">
-            <div class="alert alert-info text-center">
-                <i class="bi bi-info-circle"></i> No lost items reported yet.
+            <div class="search-card text-center py-5">
+                <i class="bi bi-inbox display-1 text-muted"></i>
+                <p class="mt-3">No lost items reported yet.</p>
             </div>
         </div>
         {% endfor %}
@@ -344,40 +485,39 @@
 
 <!-- RECENT FOUND ITEMS -->
 <div class="container mt-5">
-    <h2 class="text-center section-title">Recently Found Items</h2>
+    <h2 class="section-title">Recently Found Items</h2>
     <div class="row">
         {% for item in found_items %}
         <div class="col-md-4 mb-4">
-            <div class="card item-card shadow h-100">
+            <div class="item-card h-100">
                 {% if item.image %}
                 <img src="{{ item.image.url }}" class="item-image">
                 {% else %}
-                <div class="item-image bg-secondary d-flex align-items-center justify-content-center">
-                    <i class="bi bi-image display-1 text-white"></i>
+                <div class="item-image bg-gradient-custom d-flex align-items-center justify-content-center">
+                    <i class="bi bi-image display-1 text-white-50"></i>
                 </div>
                 {% endif %}
-                <div class="card-body">
-                    <h5 class="fw-bold text-success">
-                        <i class="bi bi-check-circle"></i> {{ item.name }}
+                <div class="card-body p-4">
+                    <h5 class="fw-bold">
+                        <i class="bi bi-check-circle text-success"></i> {{ item.name }}
                     </h5>
                     <p class="text-muted">{{ item.description|truncatewords:20 }}</p>
                     <div class="mt-3">
-                        <small class="text-muted">
+                        <small class="text-muted d-block">
                             <i class="bi bi-geo-alt"></i> Found: {{ item.location_found }}
                         </small>
-                        <br>
-                        <small class="text-muted">
+                        <small class="text-muted d-block">
                             <i class="bi bi-calendar"></i> Date: {{ item.date_found }}
                         </small>
                     </div>
                 </div>
-                <div class="card-footer bg-white border-0 pb-3">
+                <div class="card-footer bg-white border-0 pb-4">
                     {% if item.is_claimed %}
-                    <span class="badge bg-success">
+                    <span class="badge bg-success px-3 py-2">
                         <i class="bi bi-check-circle"></i> Claimed
                     </span>
                     {% else %}
-                    <span class="badge bg-warning text-dark">
+                    <span class="badge bg-warning text-dark px-3 py-2">
                         <i class="bi bi-clock"></i> Not Claimed
                     </span>
                     {% endif %}
@@ -386,8 +526,9 @@
         </div>
         {% empty %}
         <div class="col-12">
-            <div class="alert alert-info text-center">
-                <i class="bi bi-info-circle"></i> No found items reported yet.
+            <div class="search-card text-center py-5">
+                <i class="bi bi-inbox display-1 text-muted"></i>
+                <p class="mt-3">No found items reported yet.</p>
             </div>
         </div>
         {% endfor %}
@@ -396,8 +537,8 @@
 
 <!-- STATISTICS CHART -->
 <div class="container mt-5">
-    <div class="card shadow-lg p-4">
-        <h3 class="text-center mb-4">
+    <div class="search-card p-4">
+        <h3 class="mb-4">
             <i class="bi bi-graph-up"></i> System Statistics
         </h3>
         <canvas id="statsChart" height="100"></canvas>
@@ -406,7 +547,7 @@
 
 <!-- CALL TO ACTION -->
 <div class="container mt-5">
-    <div class="card bg-primary text-white shadow-lg p-5 text-center">
+    <div class="search-card text-center p-5 bg-gradient-custom text-white">
         <h2 class="mb-3">Lost or Found Something?</h2>
         <p class="lead mb-4">Join our community and help reunite items with their owners</p>
         {% if not user.is_authenticated %}
@@ -433,28 +574,32 @@
     <div class="container">
         <div class="row">
             <div class="col-md-4">
-                <h5><i class="bi bi-search-heart"></i> Lost & Found System</h5>
-                <p>Helping people reunite with their lost belongings since 2024</p>
+                <h5><i class="bi bi-search-heart"></i> Lost Management System</h5>
+                <p>Helping people reunite with their lost belongings efficiently.</p>
             </div>
             <div class="col-md-4">
                 <h5>Quick Links</h5>
                 <ul class="list-unstyled">
-                    <li><a href="/dashboard/" class="text-white-50 text-decoration-none">Dashboard</a></li>
-                    <li><a href="/add-lost/" class="text-white-50 text-decoration-none">Report Lost</a></li>
-                    <li><a href="/add-found/" class="text-white-50 text-decoration-none">Report Found</a></li>
+                    <li><a href="/dashboard/">Dashboard</a></li>
+                    <li><a href="/add-lost/">Report Lost</a></li>
+                    <li><a href="/add-found/">Report Found</a></li>
+                    <li><a href="/notifications/">Notifications</a></li>
                 </ul>
             </div>
             <div class="col-md-4">
                 <h5>Contact</h5>
-                <p class="text-white-50">
-                    <i class="bi bi-envelope"></i> support@lostfound.com<br>
-                    <i class="bi bi-telephone"></i> +1 234 567 890
+                <p class="contact-number">
+                    <i class="bi bi-telephone-fill"></i> 
+                    <a href="tel:+256758398894">0758398894</a>
+                </p>
+                <p>
+                    <i class="bi bi-envelope"></i> support@lostmanagement.com
                 </p>
             </div>
         </div>
         <hr class="bg-white-50">
         <div class="text-center">
-            <p class="mb-0 text-white-50">&copy; 2024 Lost & Found Management System. All rights reserved.</p>
+            <p class="mb-0 text-white-50">&copy; 2024 Lost Management System. All rights reserved.</p>
         </div>
     </div>
 </footer>
@@ -472,10 +617,10 @@
                 label: 'Number of Items',
                 data: [{{ lost_count }}, {{ found_count }}, {{ claimed_count }}, {{ unclaimed_count }}],
                 backgroundColor: [
-                    'rgba(220, 53, 69, 0.7)',
-                    'rgba(40, 167, 69, 0.7)',
-                    'rgba(0, 123, 255, 0.7)',
-                    'rgba(255, 193, 7, 0.7)'
+                    'rgba(220, 53, 69, 0.8)',
+                    'rgba(40, 167, 69, 0.8)',
+                    'rgba(0, 123, 255, 0.8)',
+                    'rgba(255, 193, 7, 0.8)'
                 ],
                 borderColor: [
                     'rgb(220, 53, 69)',
@@ -483,7 +628,8 @@
                     'rgb(0, 123, 255)',
                     'rgb(255, 193, 7)'
                 ],
-                borderWidth: 2
+                borderWidth: 2,
+                borderRadius: 10
             }]
         },
         options: {
@@ -493,16 +639,27 @@
                 y: {
                     beginAtZero: true,
                     ticks: {
-                        stepSize: 1
+                        stepSize: 1,
+                        precision: 0
+                    },
+                    grid: {
+                        color: 'rgba(255,255,255,0.1)'
+                    }
+                },
+                x: {
+                    ticks: {
+                        color: '#333'
                     }
                 }
             },
             plugins: {
                 legend: {
                     position: 'top',
-                },
-                title: {
-                    display: false
+                    labels: {
+                        font: {
+                            size: 12
+                        }
+                    }
                 }
             }
         }
