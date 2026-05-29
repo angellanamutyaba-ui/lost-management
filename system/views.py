@@ -416,69 +416,6 @@ from django.contrib.auth.models import User
 from django.http import JsonResponse
 
 @staff_member_required
-def user_management(request):
-    users = User.objects.all().order_by('-date_joined')
-    
-    for user in users:
-        user.lost_count = LostItem.objects.filter(user=user).count()
-        user.found_count = FoundItem.objects.filter(user=user).count()
-    
-    context = {
-        'users': users,
-        'total_users': users.count(),
-        'active_users': users.filter(is_active=True).count(),
-        'staff_users': users.filter(is_staff=True).count(),
-        'inactive_users': users.filter(is_active=False).count(),
-    }
-    return render(request, 'user_management.html', context)
-
-
-@staff_member_required
-def toggle_user_status(request, id):
-    user = get_object_or_404(User, id=id)
-    if user != request.user:
-        user.is_active = not user.is_active
-        user.save()
-        messages.success(request, f"User {user.username} status updated!")
-    return redirect('user_management')
-
-
-@staff_member_required
-def make_staff(request, id):
-    user = get_object_or_404(User, id=id)
-    if user != request.user:
-        user.is_staff = not user.is_staff
-        user.save()
-        messages.success(request, f"User {user.username} staff status updated!")
-    return redirect('user_management')
-
-
-@staff_member_required
-def delete_user(request, id):
-    user = get_object_or_404(User, id=id)
-    if user != request.user:
-        username = user.username
-        user.delete()
-        messages.success(request, f"User {username} deleted!")
-    return redirect('user_management')
-
-
-@staff_member_required
-def user_detail(request, id):
-    user = get_object_or_404(User, id=id)
-    lost_items = LostItem.objects.filter(user=user)
-    found_items = FoundItem.objects.filter(user=user)
-    context = {
-        'user_detail': user,
-        'lost_items': lost_items,
-        'found_items': found_items,
-        'lost_count': lost_items.count(),
-        'found_count': found_items.count(),
-    }
-    return render(request, 'user_detail.html', context)
-
-
-def unread_notification_count(request):
     if request.user.is_authenticated:
         count = Notification.objects.filter(user=request.user, is_read=False).count()
         return JsonResponse({'count': count})
