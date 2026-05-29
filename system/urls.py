@@ -33,4 +33,12 @@ urlpatterns = [
     path('notifications/', views.notifications_view, name='notifications'),
     path('notifications/mark/<int:id>/', views.mark_notification_read, name='mark_notification_read'),
     path('alert-preferences/', views.alert_preferences, name='alert_preferences'),
+    path('notifications/api/unread-count/', views.unread_notification_count, name='unread_count'),
+    
+    # User Management URLs - FIXED
+    path('user-management/', views.user_management, name='user_management'),
+    path('user-management/toggle/<int:id>/', views.toggle_user_status, name='toggle_user_status'),
+    path('user-management/make-staff/<int:id>/', views.make_staff, name='make_staff'),
+    path('user-management/delete/<int:id>/', views.delete_user, name='delete_user'),
+    path('user-management/detail/<int:id>/', views.user_detail, name='user_detail'),
 ]
