@@ -105,3 +105,36 @@
 
 </body>
 </html>
+<script>
+    function beep() {
+        var context = new (window.AudioContext || window.webkitAudioContext)();
+        var oscillator = context.createOscillator();
+        var gainNode = context.createGain();
+        
+        oscillator.connect(gainNode);
+        gainNode.connect(context.destination);
+        
+        oscillator.frequency.value = 800;
+        gainNode.gain.value = 0.5;
+        
+        oscillator.start();
+        setTimeout(function() {
+            oscillator.stop();
+        }, 200);
+    }
+    
+    // Call beep() when new notification arrives
+    function checkAndBeep() {
+        var oldCount = parseInt(localStorage.getItem('notifCount') || '0');
+        fetch('/notifications/api/unread-count/')
+            .then(r => r.json())
+            .then(data => {
+                if (data.count > oldCount) {
+                    beep();  // Play sound!
+                }
+                localStorage.setItem('notifCount', data.count);
+            });
+    }
+    
+    setInterval(checkAndBeep, 30000);
+</script>
