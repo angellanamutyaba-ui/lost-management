@@ -5,6 +5,7 @@ from django.contrib.auth.forms import UserCreationForm
 from django.contrib.auth import login, logout, authenticate
 from django.contrib import messages
 from django.contrib.auth.models import User
+from django.http import JsonResponse
 
 from .models import LostItem, FoundItem, Notification, AlertPreference
 from .notifications import notify_item_approved, notify_item_rejected, notify_item_claimed
@@ -318,11 +319,11 @@ def alert_preferences(request):
     
     return render(request, 'alert_preferences.html', {'prefs': prefs})
 
+
 # ========== USER MANAGEMENT FUNCTIONS ==========
 @staff_member_required
 def user_management(request):
     """Admin page to manage all users"""
-    from django.contrib.auth.models import User
     users = User.objects.all().order_by('-date_joined')
     
     for user in users:
@@ -343,7 +344,6 @@ def user_management(request):
 @staff_member_required
 def toggle_user_status(request, id):
     """Activate or deactivate a user"""
-    from django.contrib.auth.models import User
     user = get_object_or_404(User, id=id)
     
     if user == request.user:
@@ -360,7 +360,6 @@ def toggle_user_status(request, id):
 @staff_member_required
 def make_staff(request, id):
     """Make a user staff member"""
-    from django.contrib.auth.models import User
     user = get_object_or_404(User, id=id)
     
     if user == request.user:
@@ -377,7 +376,6 @@ def make_staff(request, id):
 @staff_member_required
 def delete_user(request, id):
     """Delete a user account"""
-    from django.contrib.auth.models import User
     user = get_object_or_404(User, id=id)
     
     if user == request.user:
@@ -393,7 +391,6 @@ def delete_user(request, id):
 @staff_member_required
 def user_detail(request, id):
     """View user details"""
-    from django.contrib.auth.models import User
     user = get_object_or_404(User, id=id)
     
     lost_items = LostItem.objects.filter(user=user).order_by('-created_at')
@@ -411,11 +408,10 @@ def user_detail(request, id):
     }
     return render(request, 'user_detail.html', context)
 
-# ========== USER MANAGEMENT FUNCTIONS ==========
-from django.contrib.auth.models import User
-from django.http import JsonResponse
 
-@staff_member_required
+# ========== API FOR SOUND NOTIFICATIONS ==========
+def unread_notification_count(request):
+    """API endpoint to get unread notification count for sound alerts"""
     if request.user.is_authenticated:
         count = Notification.objects.filter(user=request.user, is_read=False).count()
         return JsonResponse({'count': count})
