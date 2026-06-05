@@ -47,7 +47,7 @@ def login_user(request):
         if user is not None:
             login(request, user)
             messages.success(request, f"Welcome back, {username}!")
-            return redirect(request.META.get(.HTTP_REFERER., .dashboard.))
+            return redirect('dashboard')
         else:
             messages.error(request, "Invalid username or password!")
     
@@ -75,7 +75,7 @@ def register(request):
             AlertPreference.objects.create(user=user)
             login(request, user)
             messages.success(request, "Account created successfully!")
-            return redirect(request.META.get(.HTTP_REFERER., .dashboard.))
+            return redirect('dashboard')
     
     return render(request, 'register.html')
 
@@ -149,7 +149,7 @@ def add_lost(request):
             is_approved=False,  # Needs admin approval
         )
         messages.success(request, "Lost item submitted for admin approval!")
-        return redirect(request.META.get(.HTTP_REFERER., .dashboard.))
+        return redirect('dashboard')
     
     return render(request, 'add_lost.html')
 
@@ -168,7 +168,7 @@ def add_found(request):
             is_approved=False,  # Needs admin approval
         )
         messages.success(request, "Found item submitted for admin approval!")
-        return redirect(request.META.get(.HTTP_REFERER., .dashboard.))
+        return redirect('dashboard')
     
     return render(request, 'add_found.html')
 
@@ -176,7 +176,7 @@ def add_found(request):
 # CLAIM LOST ITEM
 @login_required
 def claim_lost(request, id):
-    item = get_object_or_404\(LostItem, id=id\)
+    item = get_object_or_404(LostItem, id=id)
     
     if not item.is_claimed:
         item.is_claimed = True
@@ -186,13 +186,13 @@ def claim_lost(request, id):
     else:
         messages.warning(request, "This item has already been claimed!")
     
-    return redirect(request.META.get(.HTTP_REFERER., .dashboard.))
+    return redirect('dashboard')
 
 
 # CLAIM FOUND ITEM
 @login_required
 def claim_found(request, id):
-    item = get_object_or_404\(FoundItem, id=id\)
+    item = get_object_or_404(FoundItem, id=id)
     
     if not item.is_claimed:
         item.is_claimed = True
@@ -202,7 +202,7 @@ def claim_found(request, id):
     else:
         messages.warning(request, "This item has already been claimed!")
     
-    return redirect(request.META.get(.HTTP_REFERER., .dashboard.))
+    return redirect('dashboard')
 
 
 # DELETE LOST ITEM
@@ -212,7 +212,7 @@ def delete_lost(request, id):
     item_name = item.name
     item.delete()
     messages.success(request, f"Lost item '{item_name}' deleted successfully!")
-    return redirect(request.META.get(.HTTP_REFERER., .dashboard.))
+    return redirect('dashboard')
 
 
 # DELETE FOUND ITEM
@@ -222,7 +222,7 @@ def delete_found(request, id):
     item_name = item.name
     item.delete()
     messages.success(request, f"Found item '{item_name}' deleted successfully!")
-    return redirect(request.META.get(.HTTP_REFERER., .dashboard.))
+    return redirect('dashboard')
 
 
 # APPROVE LOST ITEM
@@ -233,7 +233,7 @@ def approve_lost(request, id):
     item.save()
     notify_item_approved(item, is_lost=True)
     messages.success(request, f"Lost item '{item.name}' has been approved!")
-    return redirect(request.META.get(.HTTP_REFERER., .dashboard.))
+    return redirect('dashboard')
 
 
 # REJECT LOST ITEM
@@ -244,7 +244,7 @@ def reject_lost(request, id):
     notify_item_rejected(item, is_lost=True)
     item.delete()
     messages.success(request, f"Lost item '{item_name}' has been rejected!")
-    return redirect(request.META.get(.HTTP_REFERER., .dashboard.))
+    return redirect('dashboard')
 
 
 # APPROVE FOUND ITEM
@@ -255,7 +255,7 @@ def approve_found(request, id):
     item.save()
     notify_item_approved(item, is_lost=False)
     messages.success(request, f"Found item '{item.name}' has been approved!")
-    return redirect(request.META.get(.HTTP_REFERER., .dashboard.))
+    return redirect('dashboard')
 
 
 # REJECT FOUND ITEM
@@ -266,7 +266,7 @@ def reject_found(request, id):
     notify_item_rejected(item, is_lost=False)
     item.delete()
     messages.success(request, f"Found item '{item_name}' has been rejected!")
-    return redirect(request.META.get(.HTTP_REFERER., .dashboard.))
+    return redirect('dashboard')
 
 
 # NOTIFICATION VIEWS
